@@ -119,7 +119,8 @@ class Interpreter:
         "lambda": "builtin_lambda",
         "print": "builtin_print",
         "+": "builtin_add",
-        "-": "builtin_sub"
+        "-": "builtin_sub",
+        "*": "builtin_mul"
     }
 
     def __init__(self, program):
@@ -214,6 +215,11 @@ class Interpreter:
         args = self.eval_args(args)
         self.require_nonempty_numeric_args(args)
         return reduce(lambda sum, n: sum - n, args[1:], args[0])
+
+    def builtin_mul(self, args):
+        args = self.eval_args(args)
+        self.require_nonempty_numeric_args(args)
+        return reduce(lambda product, n: product * n, args, 1)
 
     def require_param_list(self, list):
         if not isinstance(list, List):

@@ -20,9 +20,11 @@
 (def incr (lambda (n) (+ n 1)))
 (print (incr (one)))
 
+(print (* 2 4 3 -1))
+
 #(def fact (lambda (n)
 #  (if (eq n 0)
 #    1
-#    (mul n (fact (- n 1))))))
+#    (* n (fact (- n 1))))))
 #
 #(fact 6)
