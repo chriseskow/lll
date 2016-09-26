@@ -143,7 +143,7 @@ class Interpreter:
         elif isinstance(expression, List):
             return self.eval_list(expression.items)
         else:
-            raise RuntimeError("[BUG] Don't know how to evaluate: %s" % repr(arg))
+            raise RuntimeError("[BUG] Don't know how to evaluate: %s" % repr(expression))
 
     def eval_list(self, items):
         if not items:
@@ -162,13 +162,22 @@ class Interpreter:
             if not isinstance(func, Lambda):
                 raise RuntimeError("Trying to call non-function")
             args = self.eval_args(args)
-            print("call %s(%s)" % (func, args))
-            return 999
+            if len(func.params) != len(args):
+                raise RuntimeError("Wrong number of arguments (expected %d, got %d)" % (len(func.params), len(args)))
+            for i, param in enumerate(func.params):
+                self.define_var(param, args[i])
+            retval = None
+            for expr in func.body:
+                retval = self.eval_expression(expr)
+            return retval
         else:
             raise RuntimeError("Calling undefined method: %s" % name)
 
     def eval_args(self, args):
         return [self.eval_expression(arg) for arg in args]
+
+    def define_var(self, name, value):
+        self.symbol_table[name] = value
 
     def builtin_def(self, args):
         if len(args) != 2:
@@ -177,7 +186,7 @@ class Interpreter:
             raise RuntimeError("def called without an identifier as first argument")
         key = args[0].name
         value = self.eval_expression(args[1])
-        self.symbol_table[key] = value
+        self.define_var(key, value)
         return value
 
     def builtin_lambda(self, args):
