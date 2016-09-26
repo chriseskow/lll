@@ -15,5 +15,5 @@
 (def incr (lambda (n) (+ n 1)))
 (print (incr (one))) # => 2
 
-# Invocation without def
-((lambda (x y) (* x y)) 5 6) # => 30
+# Anonymous invocation
+(print ((lambda (x y) (* x y)) 5 6)) # => 30
