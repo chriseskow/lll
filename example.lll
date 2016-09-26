@@ -1,0 +1,21 @@
+# example.lll
+
+(def PI 3.14159)
+(def ANSWER (+ 40 2))
+
+(print ANSWER)
+(print (+ 123.45))
+(print (+ 1 2 (- PI 3)))
+
+(def incr (lambda (n) (+ n 1)))
+(def one (lambda () 0))
+
+(print one)
+(print (incr (one)))
+
+#(def fact (lambda (n)
+#  (if (eq n 0)
+#    1
+#    (mul n (fact (- n 1))))))
+#
+#(fact 6)
