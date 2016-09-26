@@ -118,6 +118,7 @@ class Interpreter:
         "def": "builtin_def",
         "lambda": "builtin_lambda",
         "print": "builtin_print",
+        "=": "builtin_eq",
         "+": "builtin_add",
         "-": "builtin_sub",
         "*": "builtin_mul"
@@ -205,6 +206,13 @@ class Interpreter:
                 print("<lambda>")
             else:
                 raise RuntimeError("[BUG] Don't know how to print: %s" % repr(arg))
+
+    def builtin_eq(self, args):
+        args = self.eval_args(args)
+        self.require_nonempty_numeric_args(args)
+        if len(args) == 1:
+            raise RuntimeError("Need more than one argument")
+        return int(args.count(args[0]) == len(args))
 
     def builtin_add(self, args):
         args = self.eval_args(args)
