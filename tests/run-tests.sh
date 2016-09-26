@@ -10,7 +10,7 @@ cd $(dirname ${BASH_SOURCE[0]})
 
 status=0
 for file in *.lll; do
-    expected=$(cat "$file" | grep -oE '# => .*' | cut -c6-)
+    expected=$(cat "$file" | sed -n 's/.*# *=> *\(.*\)/\1/p')
     actual=$(../lll.py $file 2>&1)
 
     if [ "$expected" = "$actual" ]; then
