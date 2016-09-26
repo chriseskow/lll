@@ -10,7 +10,7 @@ class Tokenizer:
         ("RPAREN",  compile(r'\)')),
         ("FLOAT",   compile(r'[+\-]?[0-9]+\.[0-9]+')),
         ("INT",     compile(r'[+\-]?[0-9]+')),
-        ("IDENT",   compile(r'[A-Za-z0-9~!@$%^&*\-_=+|<>?]*'))
+        ("IDENT",   compile(r'[A-Za-z0-9~!@$%^&*\-_=+|<>?]+'))
     ]
 
     def __init__(self, code):
