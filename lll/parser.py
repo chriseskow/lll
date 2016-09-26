@@ -3,6 +3,7 @@ from collections import namedtuple
 Program = namedtuple("Program", ("expressions"))
 List = namedtuple("List", ("items"))
 Identifier = namedtuple("Identifier", ("name"))
+String = namedtuple("String", ("value"))
 Integer = namedtuple("Integer", ("value"))
 Float = namedtuple("Float", ("value"))
 
@@ -22,10 +23,13 @@ class Parser:
             expressions.append(self.parse_expression())
         return Program(expressions)
 
-    # expression = IDENT | INT | FLOAT | list
+    # expression = IDENT | STRING | INT | FLOAT | list
     def parse_expression(self):
         token = self.accept("IDENT")
         if token: return Identifier(token.string)
+
+        token = self.accept("STRING")
+        if token: return String(token.string)
 
         token = self.accept("INT")
         if token: return Integer(int(token.string))

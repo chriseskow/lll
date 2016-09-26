@@ -26,7 +26,9 @@ class Interpreter:
             self.eval_expression(expression)
 
     def eval_expression(self, expression):
-        if isinstance(expression, Integer):
+        if isinstance(expression, String):
+            return expression.value
+        elif isinstance(expression, Integer):
             return expression.value
         elif isinstance(expression, Float):
             return expression.value
@@ -102,7 +104,7 @@ class Interpreter:
     def builtin_print(self, args):
         args = self.eval_args(args)
         for arg in args:
-            if isinstance(arg, (int, long, float)):
+            if isinstance(arg, (str, int, long, float)):
                 print(arg)
             elif isinstance(arg, Lambda):
                 print("<lambda>")
