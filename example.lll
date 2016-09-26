@@ -29,17 +29,26 @@
 
 (print
   (if (= 1 1)
-    1
-    0))
+    10
+    20))
 
 (print
   (if (= 1 2)
-    1
-    0))
+    10
+    20))
 
-#(def fact (lambda (n)
-#  (if (= n 0)
-#    1
-#    (* n (fact (- n 1))))))
-#
-#(fact 6)
+(def zero? (lambda (n) (= n 0)))
+(def decr (lambda (n) (- n 1)))
+(def fact (lambda (n)
+  (if (zero? n)
+    1
+    (* n (fact (decr n))))))
+
+(print 99999999999)
+(print (fact 0))
+(print (fact 1))
+(print (fact 2))
+(print (fact 3))
+(print (fact 4))
+(print (fact 5))
+(print (fact 6))
