@@ -117,6 +117,7 @@ class Interpreter:
     BUILTINS = {
         "def": "builtin_def",
         "lambda": "builtin_lambda",
+        "if": "builtin_if",
         "print": "builtin_print",
         "=": "builtin_eq",
         "+": "builtin_add",
@@ -196,6 +197,15 @@ class Interpreter:
             raise RuntimeError("lambda called with wrong number of arguments")
         params = self.require_param_list(args[0])
         return Lambda(params, args[1:])
+
+    def builtin_if(self, args):
+        if len(args) != 3:
+            raise RuntimeError("if requires 3 arguments")
+        cond = self.eval_expression(args[0])
+        if (cond):
+            return self.eval_expression(args[1])
+        else:
+            return self.eval_expression(args[2])
 
     def builtin_print(self, args):
         args = self.eval_args(args)
