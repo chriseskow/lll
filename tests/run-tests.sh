@@ -18,7 +18,7 @@ for file in *.lll; do
     else
         echo "=================================================="
         echo "FAIL: $file"
-        $DIFF -u --label "$file (expected)" --label "$file (actual)" <(echo "$expected") <(echo "$actual") # | tail -n +3
+        $DIFF -u --label "$file (expected)" --label "$file (actual)" <(echo "$expected") <(echo "$actual")
         echo "=================================================="
         status=1
     fi
