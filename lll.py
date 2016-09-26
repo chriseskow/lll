@@ -120,6 +120,8 @@ class Interpreter:
         "if": "builtin_if",
         "print": "builtin_print",
         "=": "builtin_eq",
+        "<": "builtin_lt",
+        ">": "builtin_gt",
         "+": "builtin_add",
         "-": "builtin_sub",
         "*": "builtin_mul"
@@ -223,6 +225,13 @@ class Interpreter:
         if len(args) == 1:
             raise RuntimeError("Need more than one argument")
         return int(args.count(args[0]) == len(args))
+
+    def builtin_lt(self, args):
+        if len(args) != 2:
+            raise RuntimeError("Need two arguments")
+        args = self.eval_args(args)
+        self.require_nonempty_numeric_args(args)
+        return int(args[0] < args[1])
 
     def builtin_add(self, args):
         args = self.eval_args(args)
