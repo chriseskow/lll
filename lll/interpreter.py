@@ -121,13 +121,19 @@ class Interpreter:
         return self.eval(then_expr if self.eval(cond, env) else else_expr, env)
 
     def builtin_print(self, *args):
+        string = ""
         for arg in args:
             if isinstance(arg, (str, int, long, float)):
-                print(arg)
+                string += str(arg)
+            elif isinstance(arg, Operator):
+                string += "<operator>"
+            elif isinstance(arg, Builtin):
+                string += "<builtin>"
             elif isinstance(arg, Lambda):
-                print("<lambda>")
+                string += "<lambda>"
             else:
                 raise RuntimeError("[BUG] Don't know how to print: %s" % repr(arg))
+        print(string)
 
     def builtin_eq(self, *args):
         return int(args.count(args[0]) == len(args))
