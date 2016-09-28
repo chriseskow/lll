@@ -94,9 +94,6 @@ class Interpreter:
                 "Too many arguments (max %d, but got %d)" %
                 (num_required, num_args))
 
-    def call(self, func, args):
-        pass
-
     def op_def(self, args, env):
         if len(args) != 2:
             raise RuntimeError("def called with wrong number of arguments")
