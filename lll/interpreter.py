@@ -2,9 +2,9 @@ from collections import namedtuple
 from lll.tokenizer import Tokenizer
 from lll.parser import *
 
-Operator = namedtuple("Operator", ("attr_name"))
-Builtin = namedtuple("Builtin", ("attr_name", "required_args", "variable_args"))
-Lambda = namedtuple("Lambda", ("params", "body", "env"))
+Operator = namedtuple('Operator', ('attr_name'))
+Builtin = namedtuple('Builtin', ('attr_name', 'required_args', 'variable_args'))
+Lambda = namedtuple('Lambda', ('params', 'body', 'env'))
 
 class Env:
     def __init__(self, symbols={}, outer=None):
@@ -23,18 +23,18 @@ class Env:
         self.symbols[name] = value
 
 class Interpreter:
-    GLOBAL_SYMBOLS = {
-        "def": Operator("op_def"),
-        "lambda": Operator("op_lambda"),
-        "if": Operator("op_if"),
-        "load": Operator("op_load"),
-        "print": Builtin("builtin_print", 0, True),
-        "=": Builtin("builtin_eq", 2, True),
-        "<": Builtin("builtin_lt", 2, False),
-        ">": Builtin("builtin_gt", 2, False),
-        "+": Builtin("builtin_add", 1, True),
-        "-": Builtin("builtin_sub", 1, True),
-        "*": Builtin("builtin_mul", 1, True)
+    PRIMITIVES = {
+        'def': Operator('op_def'),
+        'lambda': Operator('op_lambda'),
+        'if': Operator('op_if'),
+        'load': Operator('op_load'),
+        'print': Builtin('builtin_print', 0, True),
+        '=': Builtin('builtin_eq', 2, True),
+        '<': Builtin('builtin_lt', 2, False),
+        '>': Builtin('builtin_gt', 2, False),
+        '+': Builtin('builtin_add', 1, True),
+        '-': Builtin('builtin_sub', 1, True),
+        '*': Builtin('builtin_mul', 1, True)
     }
 
     def execute_file(self, filename, env=None):
@@ -46,7 +46,7 @@ class Interpreter:
 
     def execute(self, program, env=None):
         if env is None:
-            env = Env(self.GLOBAL_SYMBOLS.copy())
+            env = Env(self.PRIMITIVES.copy())
         retval = None
         for expr in program.expressions:
             retval = self.eval(expr, env)
@@ -135,16 +135,16 @@ class Interpreter:
         return self.execute_file(filename, env)
 
     def builtin_print(self, *args):
-        string = ""
+        string = ''
         for arg in args:
             if isinstance(arg, (str, int, long, float)):
                 string += str(arg)
             elif isinstance(arg, Operator):
-                string += "<operator>"
+                string += '<operator>'
             elif isinstance(arg, Builtin):
-                string += "<builtin>"
+                string += '<builtin>'
             elif isinstance(arg, Lambda):
-                string += "<lambda>"
+                string += '<lambda>'
             else:
                 raise RuntimeError("[BUG] Don't know how to print: %s" % repr(arg))
         print(string)
