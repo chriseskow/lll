@@ -1,4 +1,5 @@
 from collections import namedtuple
+from lll.tokenizer import Tokenizer
 from lll.parser import *
 
 Operator = namedtuple("Operator", ("attr_name"))
@@ -26,6 +27,7 @@ class Interpreter:
         "def": Operator("op_def"),
         "lambda": Operator("op_lambda"),
         "if": Operator("op_if"),
+        "load": Operator("op_load"),
         "print": Builtin("builtin_print", 0, True),
         "=": Builtin("builtin_eq", 2, True),
         "<": Builtin("builtin_lt", 2, False),
@@ -38,10 +40,13 @@ class Interpreter:
     def __init__(self, program):
         self.program = program
 
-    def execute(self):
-        env = Env(self.GLOBAL_SYMBOLS)
+    def execute(self, env=None):
+        if env is None:
+            env = Env(self.GLOBAL_SYMBOLS)
+        retval = None
         for expr in self.program.expressions:
-            self.eval(expr, env)
+            retval = self.eval(expr, env)
+        return retval
 
     def eval(self, expr, env):
         if isinstance(expr, (String, Integer, Float)):
@@ -116,6 +121,21 @@ class Interpreter:
             raise RuntimeError("if requires 3 arguments")
         (cond, then_expr, else_expr) = args
         return self.eval(then_expr if self.eval(cond, env) else else_expr, env)
+
+    def op_load(self, args, env):
+        if len(args) != 1:
+            raise RuntimeError("load requires 1 argument")
+        filename = self.eval(args[0], env)
+        if not isinstance(filename, str):
+            raise RuntimeError("load requires a string argument")
+
+        code = open(filename).read()
+        tokenizer = Tokenizer(code)
+        tokens = tokenizer.tokenize()
+        parser = Parser(tokens)
+        program = parser.parse()
+        interpreter = Interpreter(program)
+        return interpreter.execute(env)
 
     def builtin_print(self, *args):
         string = ""
