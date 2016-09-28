@@ -1,19 +1,10 @@
-(print
-  (if 0 10 20)) ; => 20
-(print
-  (if 0.0 10 20)) ; => 20
-(print
-  (if 1 10 20)) ; => 10
-(print
-  (if 123 10 20)) ; => 10
-(print
-  (if 123.45 10 20)) ; => 10
+(load "_helpers.scm")
 
-(print
-  (if (= 1 1)
-    10
-    20)) ; => 10
-(print
-  (if (= 1 2)
-    10
-    20)) ; => 20
+(assert 20 (if 0 10 20))
+(assert 20 (if 0.0 10 20))
+(assert 10 (if 1 10 20))
+(assert 10 (if 123 10 20))
+(assert 10 (if 123.45 10 20))
+
+(assert 10 (if (= 1 1) 10 20))
+(assert 20 (if (= 1 2) 10 20))

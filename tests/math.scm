@@ -1,25 +1,27 @@
+(load "_helpers.scm")
+
 ; Addition
-(print (+ 1)) ; => 1
-(print (+ 0 1)) ; => 1
-(print (+ 3 0.14159)) ; => 3.14159
+(assert 1 (+ 1))
+(assert 1 (+ 0 1))
+(assert 3.14159 (+ 3 0.14159))
 
 ; Subtraction
-(print (- 0)) ; => 0
-(print (- 1)) ; => 1
-(print (- 2 1)) ; => 1
-(print (- 3 2 1)) ; => 0
-(print (- 1 5)) ; => -4
-(print (- 3.14159 3)) ; => 0.14159
+(assert 0 (- 0))
+(assert 1 (- 1))
+(assert 1 (- 2 1))
+(assert 0 (- 3 2 1))
+(assert -4 (- 1 5))
+(assert-tolerance 0.14159 (- 3.14159 3) 0.000001)
 
 ; Multiplication
-(print (* 0)) ; => 0
-(print (* 1)) ; => 1
-(print (* 0 1)) ; => 0
-(print (* 0 1 2)) ; => 0
-(print (* 1 2)) ; => 2
-(print (* 1 2 3)) ; => 6
-(print (* 1 2 3 -4)) ; => -24
-(print (* 1 2 3 -4 -0.5)) ; => 12.0
+(assert 0 (* 0))
+(assert 1 (* 1))
+(assert 0 (* 0 1))
+(assert 0 (* 0 1 2))
+(assert 2 (* 1 2))
+(assert 6 (* 1 2 3))
+(assert -24 (* 1 2 3 -4))
+(assert 12.0 (* 1 2 3 -4 -0.5))
 
 ; Combination
-(print (+ 0 1 2 (* 3 4 (- 5 6)))) ; => -9
+(assert -9 (+ 0 1 2 (* 3 4 (- 5 6))))
