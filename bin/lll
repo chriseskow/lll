@@ -9,7 +9,7 @@ from lll.interpreter import Interpreter
 
 def main():
     if len(sys.argv) != 2:
-        raise RuntimeError("Usage: %s [filename]", sys.argv[0])
+        sys.exit("Usage: %s [filename]" % sys.argv[0])
 
     interpreter = Interpreter()
     interpreter.execute_file(sys.argv[1])
