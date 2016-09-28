@@ -22,6 +22,25 @@ class Env:
     def define(self, name, value):
         self.symbols[name] = value
 
+class REPL:
+    PROMPT = '> '
+
+    def __init__(self, interpreter):
+        self.interpreter = interpreter
+
+    def run(self):
+        while True:
+            try:
+                try:
+                    line = raw_input(self.PROMPT)
+                except EOFError:
+                    print('')
+                    return
+                value = self.interpreter.execute_string(line)
+                print(repr(value))
+            except Exception as e:
+                print e
+
 class Interpreter:
     PRIMITIVES = {
         'def': Operator('op_def'),
@@ -36,6 +55,12 @@ class Interpreter:
         '-': Builtin('builtin_sub', 1, True),
         '*': Builtin('builtin_mul', 1, True)
     }
+
+    def execute_string(self, code, env=None):
+        tokenizer = Tokenizer(code)
+        parser = Parser(tokenizer)
+        program = parser.parse()
+        return self.execute(program, env)
 
     def execute_file(self, filename, env=None):
         code = open(filename).read()
