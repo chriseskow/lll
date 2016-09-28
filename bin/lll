@@ -15,8 +15,7 @@ def main():
 
     code = open(sys.argv[1]).read()
     tokenizer = Tokenizer(code)
-    tokens = tokenizer.tokenize()
-    parser = Parser(tokens)
+    parser = Parser(tokenizer)
     program = parser.parse()
     interpreter = Interpreter(program)
     interpreter.execute()

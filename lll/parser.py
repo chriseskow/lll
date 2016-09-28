@@ -8,8 +8,9 @@ Integer = namedtuple("Integer", ("value"))
 Float = namedtuple("Float", ("value"))
 
 class Parser:
-    def __init__(self, tokens):
-        self.tokens = tokens
+    def __init__(self, tokenizer):
+        self.tokenizer = tokenizer
+        self.tokens = tokenizer.tokenize()
 
     def parse(self):
         return self.parse_program()

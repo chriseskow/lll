@@ -131,8 +131,7 @@ class Interpreter:
 
         code = open(filename).read()
         tokenizer = Tokenizer(code)
-        tokens = tokenizer.tokenize()
-        parser = Parser(tokens)
+        parser = Parser(tokenizer)
         program = parser.parse()
         interpreter = Interpreter(program)
         return interpreter.execute(env)
