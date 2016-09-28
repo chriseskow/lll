@@ -10,7 +10,7 @@ cd $(dirname ${BASH_SOURCE[0]})
 
 status=0
 for file in *.scm; do
-  expected=$(cat "$file" | sed -n 's/.*# *=> *\(.*\)/\1/p')
+  expected=$(cat "$file" | sed -n 's/.*; *=> *\(.*\)/\1/p')
   actual=$(../bin/lll $file 2>&1)
 
   if [ "$expected" = "$actual" ]; then

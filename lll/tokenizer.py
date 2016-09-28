@@ -5,7 +5,7 @@ Token = namedtuple("Token", ("type", "string", "len"))
 
 class Tokenizer:
     REGEXES = [
-        ("SPACE",   compile(r'\s+|#.*')),
+        ("SPACE",   compile(r'\s+|;.*')),
         ("LPAREN",  compile(r'\(')),
         ("RPAREN",  compile(r'\)')),
         ("FLOAT",   compile(r'[+\-]?[0-9]+\.[0-9]+')),
