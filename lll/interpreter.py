@@ -2,7 +2,7 @@ from collections import namedtuple
 from lll.parser import *
 
 Operator = namedtuple("Operator", ("attr_name"))
-Builtin = namedtuple("Builtin", ("attr_name", "min_args", "max_args"))
+Builtin = namedtuple("Builtin", ("attr_name", "required_args", "variable_args"))
 Lambda = namedtuple("Lambda", ("params", "body", "env"))
 
 class Env:
@@ -26,13 +26,13 @@ class Interpreter:
         "def": Operator("op_def"),
         "lambda": Operator("op_lambda"),
         "if": Operator("op_if"),
-        "print": Builtin("builtin_print", 0, None),
-        "=": Builtin("builtin_eq", 2, None),
-        "<": Builtin("builtin_lt", 2, 2),
-        ">": Builtin("builtin_gt", 2, 2),
-        "+": Builtin("builtin_add", 1, None),
-        "-": Builtin("builtin_sub", 1, None),
-        "*": Builtin("builtin_mul", 1, None)
+        "print": Builtin("builtin_print", 0, True),
+        "=": Builtin("builtin_eq", 2, True),
+        "<": Builtin("builtin_lt", 2, False),
+        ">": Builtin("builtin_gt", 2, False),
+        "+": Builtin("builtin_add", 1, True),
+        "-": Builtin("builtin_sub", 1, True),
+        "*": Builtin("builtin_mul", 1, True)
     }
 
     def __init__(self, program):
@@ -49,7 +49,6 @@ class Interpreter:
         elif isinstance(expr, Identifier):
             return env.lookup(expr.name)
         elif isinstance(expr, List):
-
             return self.eval_list(expr.items, env)
         else:
             raise RuntimeError("[BUG] Invalid expression: %s" % repr(expr))
@@ -65,29 +64,18 @@ class Interpreter:
             callable = getattr(self, func.attr_name)
             return callable(raw_args, env)
         elif isinstance(func, (Builtin, Lambda)):
-            args = self.map_eval(raw_args, env)
+            args = [self.eval(arg, env) for arg in raw_args]
             return self.apply(func, args)
         else:
             raise RuntimeError("Cannot call non-function: %s" % repr(func))
 
     def apply(self, func, args):
         if isinstance(func, Builtin):
-            num_args = len(args)
-            if num_args < func.min_args:
-                raise RuntimeError(
-                    "Too few arguments for builtin (min %d, but got %d)" %
-                    (func.min_args, num_args))
-            if func.max_args is not None and num_args > func.max_args:
-                raise RuntimeError(
-                    "Too many arguments for builtin (max %d, but got %d)" %
-                    (func.max_args, num_args))
+            self.check_args(args, func.required_args, func.variable_args)
             callable = getattr(self, func.attr_name)
             return callable(*args)
         elif isinstance(func, Lambda):
-            if len(func.params) != len(args):
-                raise RuntimeError(
-                    "Wrong number of arguments (expected %d, got %d)" %
-                    (len(func.params), len(args)))
+            self.check_args(args, len(func.params), False)
             symbols = dict(zip(func.params, args))
             env = Env(symbols, func.env)
             retval = None
@@ -95,8 +83,19 @@ class Interpreter:
                 retval = self.eval(expr, env)
             return retval
 
-    def map_eval(self, args, env):
-        return [self.eval(arg, env) for arg in args]
+    def check_args(self, args, num_required, has_variable):
+        num_args = len(args)
+        if num_args < num_required:
+            raise RuntimeError(
+                "Too few arguments for builtin (min %d, but got %d)" %
+                (num_required, num_args))
+        if num_args > num_required and not has_variable:
+            raise RuntimeError(
+                "Too many arguments for builtin (max %d, but got %d)" %
+                (num_required, num_args))
+
+    def call(self, func, args):
+        pass
 
     def op_def(self, args, env):
         if len(args) != 2:
