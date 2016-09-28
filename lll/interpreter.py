@@ -87,11 +87,11 @@ class Interpreter:
         num_args = len(args)
         if num_args < num_required:
             raise RuntimeError(
-                "Too few arguments for builtin (min %d, but got %d)" %
+                "Too few arguments (min %d, but got %d)" %
                 (num_required, num_args))
         if num_args > num_required and not has_variable:
             raise RuntimeError(
-                "Too many arguments for builtin (max %d, but got %d)" %
+                "Too many arguments (max %d, but got %d)" %
                 (num_required, num_args))
 
     def call(self, func, args):
