@@ -37,14 +37,18 @@ class Interpreter:
         "*": Builtin("builtin_mul", 1, True)
     }
 
-    def __init__(self, program):
-        self.program = program
+    def execute_file(self, filename, env=None):
+        code = open(filename).read()
+        tokenizer = Tokenizer(code)
+        parser = Parser(tokenizer)
+        program = parser.parse()
+        return self.execute(program, env)
 
-    def execute(self, env=None):
+    def execute(self, program, env=None):
         if env is None:
             env = Env(self.GLOBAL_SYMBOLS)
         retval = None
-        for expr in self.program.expressions:
+        for expr in program.expressions:
             retval = self.eval(expr, env)
         return retval
 
@@ -129,12 +133,7 @@ class Interpreter:
         if not isinstance(filename, str):
             raise RuntimeError("load requires a string argument")
 
-        code = open(filename).read()
-        tokenizer = Tokenizer(code)
-        parser = Parser(tokenizer)
-        program = parser.parse()
-        interpreter = Interpreter(program)
-        return interpreter.execute(env)
+        return self.execute_file(filename)
 
     def builtin_print(self, *args):
         string = ""

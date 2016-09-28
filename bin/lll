@@ -5,20 +5,14 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(sys.argv[0]) + "/.."))
 
-from lll.tokenizer import Tokenizer
-from lll.parser import Parser
 from lll.interpreter import Interpreter
 
 def main():
     if len(sys.argv) != 2:
         raise RuntimeError("Usage: %s [filename]", sys.argv[0])
 
-    code = open(sys.argv[1]).read()
-    tokenizer = Tokenizer(code)
-    parser = Parser(tokenizer)
-    program = parser.parse()
-    interpreter = Interpreter(program)
-    interpreter.execute()
+    interpreter = Interpreter()
+    interpreter.execute_file(sys.argv[1])
 
 if __name__ == "__main__":
     main()

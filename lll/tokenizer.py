@@ -1,7 +1,7 @@
 from collections import namedtuple
 from re import compile, sub
 
-Token = namedtuple("Token", ("type", "string", "len"))
+Token = namedtuple("Token", ("type", "value"))
 
 class Tokenizer:
     REGEXES = [
@@ -24,32 +24,34 @@ class Tokenizer:
     def __init__(self, code):
         self.code = code
 
-    def tokenize(self):
-        tokens = []
+    def next(self):
         while self.code:
-            token = self.next_token()
-            self.code = self.code[token.len:]
+            for type, regex in self.REGEXES:
+                match = regex.match(self.code)
+                if match:
+                    string = match.group(0)
+                    value = self.eval(type, string)
+                    token = Token(type, value)
+                    self.code = self.code[len(string):]
+                    break
+            if not token:
+                raise TokenizeError("Don't know the token: %s" % repr(self.code))
             if token.type != "SPACE":
-                tokens.append(token)
-        tokens.append(Token("EOF", None, 0))
-        return tokens
+                return token
+        return None
 
-    def next_token(self):
-        for type, regex in self.REGEXES:
-            match = regex.match(self.code)
-            if match:
-                string = match.group(0)
-                strlen = len(string)
-                if type == "STRING":
-                    string = self.tokenize_string(string)
-                return Token(type, string, strlen)
-        raise TokenizeError("Don't know the token: %s" % repr(self.code))
-
-    def tokenize_string(self, string):
-        string = string[1:-1]
-        for sequence, replacement in self.ESCAPE_SEQUENCES:
-            string = string.replace(sequence, replacement)
-        return string
+    def eval(self, type, string):
+        if type == "STRING":
+            string = string[1:-1] # Remove quotes
+            for sequence, replacement in self.ESCAPE_SEQUENCES:
+                string = string.replace(sequence, replacement)
+            return string
+        elif type == "INT":
+            return int(string)
+        elif type == "FLOAT":
+            return float(string)
+        else:
+            return string
 
 class TokenizeError(RuntimeError):
     pass

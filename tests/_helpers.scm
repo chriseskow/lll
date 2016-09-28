@@ -1,3 +1,5 @@
+(def debug-mode 0)
+
 (def <= (lambda (x y)
   (if (< x y)
     1
@@ -15,7 +17,9 @@
 
 (def assert-helper (lambda (comparator expected actual)
   (if (comparator)
-    1
+    (if debug-mode
+      (print "OK (" actual ")")
+      1)
     (print "FAIL (expected: " expected ", actual: "  actual ")"))))
 
 (def assert (lambda (expected actual)
