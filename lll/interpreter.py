@@ -46,7 +46,7 @@ class Interpreter:
 
     def execute(self, program, env=None):
         if env is None:
-            env = Env(self.GLOBAL_SYMBOLS)
+            env = Env(self.GLOBAL_SYMBOLS.copy())
         retval = None
         for expr in program.expressions:
             retval = self.eval(expr, env)
@@ -132,8 +132,7 @@ class Interpreter:
         filename = self.eval(args[0], env)
         if not isinstance(filename, str):
             raise RuntimeError("load requires a string argument")
-
-        return self.execute_file(filename)
+        return self.execute_file(filename, env)
 
     def builtin_print(self, *args):
         string = ""
