@@ -11,9 +11,27 @@ Lambda = namedtuple('Lambda', ('params', 'body', 'env'))
 import lll.builtins as builtins
 
 class Env:
-    def __init__(self, source, symbols={}, outer=None):
+    PRIMITIVES = {
+        'quote': Operator('op_quote'),
+        'def': Operator('op_def'),
+        'lambda': Operator('op_lambda'),
+        'if': Operator('op_if'),
+        'load': Operator('op_load'),
+        'load-paths': ['.'],
+        'to-string': Builtin(builtins.builtin_to_string, 1, False),
+        'repr': Builtin(builtins.builtin_repr, 1, False),
+        'print': Builtin(builtins.builtin_print, 0, True),
+        '=': Builtin(builtins.builtin_eq, 2, True),
+        '<': Builtin(builtins.builtin_lt, 2, False),
+        '>': Builtin(builtins.builtin_gt, 2, False),
+        '+': Builtin(builtins.builtin_add, 1, True),
+        '-': Builtin(builtins.builtin_sub, 1, True),
+        '*': Builtin(builtins.builtin_mul, 1, True)
+    }
+
+    def __init__(self, source, symbols=None, outer=None):
         self.source = source
-        self.symbols = symbols
+        self.symbols = symbols if symbols else self.PRIMITIVES.copy()
         self.outer = outer
 
     def lookup(self, name):
@@ -35,38 +53,14 @@ class Env:
         return symbols
 
 class Interpreter:
-    PRIMITIVES = {
-        'quote': Operator('op_quote'),
-        'def': Operator('op_def'),
-        'lambda': Operator('op_lambda'),
-        'if': Operator('op_if'),
-        'load': Operator('op_load'),
-        'load-paths': ['.'],
-        'to-string': Builtin(builtins.builtin_to_string, 1, False),
-        'repr': Builtin(builtins.builtin_repr, 1, False),
-        'print': Builtin(builtins.builtin_print, 0, True),
-        '=': Builtin(builtins.builtin_eq, 2, True),
-        '<': Builtin(builtins.builtin_lt, 2, False),
-        '>': Builtin(builtins.builtin_gt, 2, False),
-        '+': Builtin(builtins.builtin_add, 1, True),
-        '-': Builtin(builtins.builtin_sub, 1, True),
-        '*': Builtin(builtins.builtin_mul, 1, True)
-    }
-
-    def execute(self, source, env=None):
-        tokenizer = Tokenizer(source)
+    def execute(self, env):
+        tokenizer = Tokenizer(env.source)
         parser = Parser(tokenizer)
         sequence = parser.parse()
-        if env is None:
-            env = self.make_global_env(source)
-
         retval = None
         for expr in sequence:
             retval = self.eval(expr, env)
         return retval
-
-    def make_global_env(self, source):
-        return Env(source, self.PRIMITIVES.copy())
 
     def eval(self, expr, env):
         if isinstance(expr, Symbol):
@@ -155,7 +149,7 @@ class Interpreter:
         code = open(resolved_filename).read()
         old_source = env.source
         env.source = Source(filename, code)
-        self.execute(env.source, env)
+        self.execute(env)
         env.source = old_source
         return None
 

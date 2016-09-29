@@ -1,7 +1,12 @@
 from collections import namedtuple
 from re import compile, sub
 
-Source = namedtuple('Source', ('filename', 'code')) # TODO: move elsewhere?
+# TODO: move elsewhere?
+class Source:
+    def __init__(self, filename, code):
+        self.filename = filename
+        self.code = code
+
 Token = namedtuple('Token', ('type', 'value'))
 
 class Tokenizer:

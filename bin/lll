@@ -6,7 +6,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.dirname(sys.argv[0]) + '/..'))
 
 from lll.tokenizer import Source
-from lll.interpreter import Interpreter
+from lll.interpreter import Env, Interpreter
 
 def main():
     if len(sys.argv) > 2:
@@ -22,7 +22,8 @@ def main():
         filename = sys.argv[1]
         code = open(filename).read()
         source = Source(filename, code)
-        interpreter.execute(source)
+        env = Env(source)
+        interpreter.execute(env)
 
 if __name__ == '__main__':
     main()

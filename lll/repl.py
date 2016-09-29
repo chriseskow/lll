@@ -2,6 +2,7 @@ from traceback import print_exc
 import readline
 from lll.tokenizer import Source
 from lll.parser import IncompleteParseError
+from lll.interpreter import Env
 from lll.builtins import builtin_repr
 
 if 'libedit' in readline.__doc__:
@@ -22,7 +23,7 @@ class REPL:
 
     def run(self):
         source = Source('<repl>', '')
-        self.env = self.interpreter.make_global_env(source)
+        self.env = Env(source)
 
         input = ''
         while True:
@@ -34,8 +35,8 @@ class REPL:
                     print('')
                     return
                 try:
-                    source = Source('<repl>', input)
-                    value = self.interpreter.execute(source, self.env)
+                    self.env.source.code = input
+                    value = self.interpreter.execute(self.env)
                 except IncompleteParseError as e:
                     continue
                 if value:
