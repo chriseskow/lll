@@ -1,10 +1,6 @@
-(def debug-mode 0)
-
 (def assert-helper (lambda (comparator expected actual)
   (if (comparator)
-    (if debug-mode
-      (print "OK (" actual ")")
-      1)
+    (print "OK (" actual ")")
     (print "FAIL (expected: " expected ", actual: "  actual ")"))))
 
 (def assert (lambda (expected actual)

@@ -6,7 +6,6 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.dirname(sys.argv[0]) + '/..'))
 
 from lll.interpreter import Interpreter
-from lll.repl import REPL
 
 def main():
     if len(sys.argv) > 2:
@@ -15,6 +14,7 @@ def main():
     interpreter = Interpreter()
 
     if len(sys.argv) == 1:
+        from lll.repl import REPL
         repl = REPL(interpreter)
         repl.run()
     else:
