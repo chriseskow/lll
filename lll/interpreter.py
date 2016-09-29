@@ -31,6 +31,7 @@ class Env:
 
 class Interpreter:
     PRIMITIVES = {
+        'quote': Operator('op_quote'),
         'def': Operator('op_def'),
         'lambda': Operator('op_lambda'),
         'if': Operator('op_if'),
@@ -121,6 +122,11 @@ class Interpreter:
                 "Too many arguments (max %d, but got %d)" %
                 (num_required, num_args))
 
+    def op_quote(self, args, env):
+        if len(args) != 1:
+            raise RuntimeError("quote requires 1 argument")
+        return args[0]
+
     def op_def(self, args, env):
         if len(args) != 2:
             raise RuntimeError("def called with wrong number of arguments")
@@ -161,14 +167,46 @@ class Interpreter:
             return '<builtin>'
         elif isinstance(value, Lambda):
             return '<lambda>'
+
+        # TODO: shouldn't these be the same as above???
+        # Perhaps eval() should return String, Integer, etc. instead of
+        # the underlying Python primitives.
+        elif isinstance(value, (String, Integer, Float)):
+            return str(value.value)
+        elif isinstance(value, Identifier):
+            return value.name
+        elif isinstance(value, List):
+            return '(' + ' '.join(self.builtin_to_string(item) for item in value.items) + ')'
+
         else:
-            raise RuntimeError("[BUG] Don't know how to print: %s" % repr(arg))
+            raise RuntimeError("[BUG] Don't know how to print: %s" % repr(value))
 
     def builtin_repr(self, value):
         if isinstance(value, str):
             return '"' + value + '"' # TODO: escape slashes
+        elif isinstance(value, (int, long, float)):
+            return str(value)
+        elif isinstance(value, Operator):
+            return '<operator>'
+        elif isinstance(value, Builtin):
+            return '<builtin>'
+        elif isinstance(value, Lambda):
+            return '<lambda>'
+
+        # TODO: shouldn't these be the same as above???
+        # Perhaps eval() should return String, Integer, etc. instead of
+        # the underlying Python primitives.
+        elif isinstance(value, String):
+            return '"' + value.value + '"' # TODO: escape slashes
+        elif isinstance(value, (Integer, Float)):
+            return str(value.value)
+        elif isinstance(value, Identifier):
+            return value.name
+        elif isinstance(value, List):
+            return '(' + ' '.join(self.builtin_repr(item) for item in value.items) + ')'
+
         else:
-            return self.builtin_to_string(value)
+            raise RuntimeError("[BUG] Don't know how to print: %s" % repr(value))
 
     def builtin_print(self, *args):
         print(''.join(self.builtin_to_string(arg) for arg in args))
