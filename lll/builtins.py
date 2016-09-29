@@ -38,6 +38,9 @@ def builtin_print(*args):
     print(''.join(builtin_to_string(arg) for arg in args))
     return None
 
+def builtin_compare(x, y):
+    return (x > y) - (x < y)
+
 def builtin_eq(*args):
     return int(args.count(args[0]) == len(args))
 
