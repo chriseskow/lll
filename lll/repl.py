@@ -39,7 +39,7 @@ class REPL:
                     value = self.interpreter.execute(self.env)
                 except IncompleteParseError as e:
                     continue
-                if value:
+                if value is not None:
                     print(self.OUTPUT_PROMPT + builtin_repr(value))
             except:
                 print_exc()

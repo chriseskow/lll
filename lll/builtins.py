@@ -1,6 +1,9 @@
 from lll.parser import Symbol
 from lll.interpreter import Operator, Builtin, Lambda
 
+def builtin_list(*args):
+    return list(args)
+
 def builtin_to_string(value):
     if isinstance(value, (Symbol, str, int, long, float)):
         return str(value)
