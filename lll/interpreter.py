@@ -18,6 +18,7 @@ class Env:
         'if': Operator('op_if'),
         'load': Operator('op_load'),
         'load-paths': ['.'],
+        'type': Builtin(builtins.builtin_type, 1, False),
         'list': Builtin(builtins.builtin_list, 0, True),
         'to-string': Builtin(builtins.builtin_to_string, 1, False),
         'repr': Builtin(builtins.builtin_repr, 1, False),

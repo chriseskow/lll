@@ -1,6 +1,26 @@
 from lll.parser import Symbol
 from lll.interpreter import Operator, Builtin, Lambda
 
+def builtin_type(value):
+    if isinstance(value, Symbol):
+        return 'symbol'
+    if isinstance(value, (int, long)):
+        return 'int'
+    if isinstance(value, float):
+        return 'float'
+    elif isinstance(value, str):
+        return 'string'
+    elif isinstance(value, list):
+        return 'list'
+    elif isinstance(value, Operator):
+        return 'operator'
+    elif isinstance(value, Builtin):
+        return 'builtin'
+    elif isinstance(value, Lambda):
+        return 'lambda'
+    else:
+        raise RuntimeError("[BUG] Don't know type of: %s" % repr(value))
+
 def builtin_list(*args):
     return list(args)
 
