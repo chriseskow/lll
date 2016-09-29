@@ -1,6 +1,6 @@
 (load "./_helpers.scm")
 
-(def (fib n)
+(define (fib n)
   (if (< n 2)
     n
     (+

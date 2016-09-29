@@ -1,8 +1,8 @@
 (load "./_helpers.scm")
 
-(def (zero? n) (= n 0))
-(def (decr n) (- n 1))
-(def (fact n)
+(define (zero? n) (= n 0))
+(define (decr n) (- n 1))
+(define (fact n)
   (if (zero? n)
     1
     (* n (fact (decr n)))))

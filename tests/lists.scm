@@ -1,6 +1,6 @@
 (load "./_helpers.scm")
 
-(def n 3)
+(define n 3)
 (assert (quote ()) (list))
 (assert (quote (1)) (list 1))
 (assert (quote (1 2)) (list 1 2))

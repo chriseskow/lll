@@ -13,7 +13,7 @@ import lll.builtins as builtins
 class Env:
     PRIMITIVES = {
         'quote': Operator('op_quote'),
-        'def': Operator('op_def'),
+        'define': Operator('op_define'),
         'lambda': Operator('op_lambda'),
         'if': Operator('op_if'),
         'load': Operator('op_load'),
@@ -120,7 +120,7 @@ class Interpreter:
             raise RuntimeError("quote requires 1 argument")
         return args[0]
 
-    def op_def(self, args, env):
+    def op_define(self, args, env):
         if len(args) == 2 and isinstance(args[0], Symbol):
             (name, expr) = args
             value = self.eval(expr, env)
@@ -129,7 +129,7 @@ class Interpreter:
             body = args[1:]
             value = Lambda(params, body, env)
         else:
-            raise RuntimeError("Invalid syntax for def")
+            raise RuntimeError("Invalid syntax for define")
         env.define(name, value)
         return value
 

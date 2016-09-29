@@ -1,25 +1,25 @@
 (load "./_helpers.scm")
 
 ; Scalar value
-(def PI 3.14159)
+(define PI 3.14159)
 (assert 4.14159 (+ 2 2 (- PI 3)))
 
 ; Calculated value
-(def ANSWER (+ 40 2))
+(define ANSWER (+ 40 2))
 (assert 42 ANSWER)
 
 ; Function binding
-(def n 1)
-(def f (lambda ()
+(define n 1)
+(define f (lambda ()
   (assert 1 n)
-  (def n 2)
+  (define n 2)
   (assert 2 n)))
 (f)
 
-; Function definition syntax
-(def (g) 3)
-(def (h x) (* x (g)))
-(def (i x y)
+; Function defineinition syntax
+(define (g) 3)
+(define (h x) (* x (g)))
+(define (i x y)
   (* x y) ; Useless, but tests multiple-expression body
   (- x (h y)))
 (assert 3 (g))
