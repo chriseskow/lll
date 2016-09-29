@@ -58,11 +58,20 @@ class Parser:
 
     def expect(self, type):
         if not self.accept(type):
-            actual_type = self.next_token.type
-            raise ParseError("Expected token %s (got %s)" % (type, actual_type))
+            if self.next_token:
+                actual_type = self.next_token.type
+                raise UnexpectedTokenError("Expected token %s (got %s)" % (type, actual_type))
+            else:
+                raise IncompleteParseError("Unexpected end-of-input")
 
     def consume(self):
         (self.curr_token, self.next_token) = (self.next_token, self.tokenizer.next())
 
 class ParseError(RuntimeError):
+    pass
+
+class UnexpectedTokenError(ParseError):
+    pass
+
+class IncompleteParseError(ParseError):
     pass

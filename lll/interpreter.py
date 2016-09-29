@@ -22,24 +22,12 @@ class Env:
     def define(self, name, value):
         self.symbols[name] = value
 
-class REPL:
-    PROMPT = '> '
-
-    def __init__(self, interpreter):
-        self.interpreter = interpreter
-
-    def run(self):
-        while True:
-            try:
-                try:
-                    line = raw_input(self.PROMPT)
-                except EOFError:
-                    print('')
-                    return
-                value = self.interpreter.execute_string(line)
-                print(repr(value))
-            except Exception as e:
-                print e
+    def all(self):
+        symbols = {}
+        if self.outer:
+            symbols.update(self.outer.all())
+        symbols.update(self.symbols)
+        return symbols
 
 class Interpreter:
     PRIMITIVES = {
@@ -71,11 +59,14 @@ class Interpreter:
 
     def execute(self, program, env=None):
         if env is None:
-            env = Env(self.PRIMITIVES.copy())
+            env = self.make_global_env()
         retval = None
         for expr in program.expressions:
             retval = self.eval(expr, env)
         return retval
+
+    def make_global_env(self):
+        return Env(self.PRIMITIVES.copy())
 
     def eval(self, expr, env):
         if isinstance(expr, (String, Integer, Float)):
