@@ -1,6 +1,6 @@
 from collections import namedtuple
 from lll.tokenizer import Tokenizer
-from lll.parser import *
+from lll.parser import Parser, Symbol
 
 Operator = namedtuple('Operator', ('attr_name'))
 Builtin = namedtuple('Builtin', ('func', 'required_args', 'variable_args'))
@@ -58,16 +58,13 @@ class Interpreter:
 
     def execute_file(self, filename, env=None):
         code = open(filename).read()
-        tokenizer = Tokenizer(code)
-        parser = Parser(tokenizer)
-        sequence = parser.parse()
-        return self.execute(sequence, env)
+        return self.execute_string(code, env)
 
     def execute(self, sequence, env=None):
         if env is None:
             env = self.make_global_env()
         retval = None
-        for expr in sequence.expressions:
+        for expr in sequence:
             retval = self.eval(expr, env)
         return retval
 
@@ -75,12 +72,12 @@ class Interpreter:
         return Env(self.PRIMITIVES.copy())
 
     def eval(self, expr, env):
-        if isinstance(expr, (String, Integer, Float)):
-            return expr.value
-        elif isinstance(expr, Identifier):
-            return env.lookup(expr.name)
-        elif isinstance(expr, List):
-            return self.eval_list(expr.items, env)
+        if isinstance(expr, Symbol):
+            return env.lookup(expr)
+        elif isinstance(expr, (str, int, long, float)):
+            return expr
+        elif isinstance(expr, list):
+            return self.eval_list(expr, env)
         else:
             raise RuntimeError("[BUG] Invalid expression: %s" % repr(expr))
 
@@ -132,12 +129,11 @@ class Interpreter:
     def op_def(self, args, env):
         if len(args) != 2:
             raise RuntimeError("def called with wrong number of arguments")
-        (ident, value_expr) = args
-        if not isinstance(ident, Identifier):
+        (symbol, value_expr) = args
+        if not isinstance(symbol, Symbol):
             raise RuntimeError("def called without an identifier as first argument")
-        key = ident.name
         value = self.eval(value_expr, env)
-        env.define(key, value)
+        env.define(symbol, value)
         return value
 
     def op_lambda(self, args, env):
@@ -160,12 +156,12 @@ class Interpreter:
             raise RuntimeError("load requires a string argument")
         return self.execute_file(filename, env)
 
-    def require_param_list(self, list):
-        if not isinstance(list, List):
+    def require_param_list(self, items):
+        if not isinstance(items, list):
             raise RuntimeError("lambda called without argument list")
         params = []
-        for item in list.items:
-            if not isinstance(item, Identifier):
+        for item in items:
+            if not isinstance(item, Symbol):
                 raise RuntimeError("lambda called with non-identifier param")
-            params.append(item.name)
+            params.append(item)
         return params

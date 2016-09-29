@@ -1,53 +1,33 @@
-from lll.parser import *
+from lll.parser import Symbol
 from lll.interpreter import Operator, Builtin, Lambda
 
 def builtin_to_string(value):
-    if isinstance(value, (str, int, long, float)):
+    if isinstance(value, (Symbol, str, int, long, float)):
         return str(value)
+    elif isinstance(value, list):
+        return '(' + ' '.join(builtin_to_string(item) for item in value) + ')'
     elif isinstance(value, Operator):
         return '<operator>'
     elif isinstance(value, Builtin):
         return '<builtin>'
     elif isinstance(value, Lambda):
         return '<lambda>'
-
-    # TODO: shouldn't these be the same as above???
-    # Perhaps eval() should return String, Integer, etc. instead of
-    # the underlying Python primitives.
-    elif isinstance(value, (String, Integer, Float)):
-        return str(value.value)
-    elif isinstance(value, Identifier):
-        return value.name
-    elif isinstance(value, List):
-        return '(' + ' '.join(builtin_to_string(item) for item in value.items) + ')'
-
     else:
         raise RuntimeError("[BUG] Don't know how to print: %s" % repr(value))
 
 def builtin_repr(value):
-    if isinstance(value, str):
-        return '"' + value + '"' # TODO: escape slashes
-    elif isinstance(value, (int, long, float)):
+    if isinstance(value, (Symbol, int, long, float)):
         return str(value)
+    elif isinstance(value, str):
+        return '"' + value + '"' # TODO: escape slashes
+    elif isinstance(value, list):
+        return '(' + ' '.join(builtin_repr(item) for item in value) + ')'
     elif isinstance(value, Operator):
         return '<operator>'
     elif isinstance(value, Builtin):
         return '<builtin>'
     elif isinstance(value, Lambda):
         return '<lambda>'
-
-    # TODO: shouldn't these be the same as above???
-    # Perhaps eval() should return String, Integer, etc. instead of
-    # the underlying Python primitives.
-    elif isinstance(value, String):
-        return '"' + value.value + '"' # TODO: escape slashes
-    elif isinstance(value, (Integer, Float)):
-        return str(value.value)
-    elif isinstance(value, Identifier):
-        return value.name
-    elif isinstance(value, List):
-        return '(' + ' '.join(builtin_repr(item) for item in value.items) + ')'
-
     else:
         raise RuntimeError("[BUG] Don't know how to print: %s" % repr(value))
 

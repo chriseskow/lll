@@ -1,11 +1,8 @@
 from collections import namedtuple
 
-Sequence = namedtuple('Sequence', ('expressions'))
-List = namedtuple('List', ('items'))
-Identifier = namedtuple('Identifier', ('name'))
-String = namedtuple('String', ('value'))
-Integer = namedtuple('Integer', ('value'))
-Float = namedtuple('Float', ('value'))
+class Symbol(str):
+    def __repr__(self):
+        return 'Symbol(%s)' % self
 
 class Parser:
     def __init__(self, tokenizer):
@@ -22,18 +19,18 @@ class Parser:
         expressions = []
         while self.next_token:
             expressions.append(self.parse_expression())
-        return Sequence(expressions)
+        return expressions
 
     # expression = IDENT | STRING | INT | FLOAT | list
     def parse_expression(self):
         if self.accept('IDENT'):
-            return Identifier(self.curr_token.value)
+            return Symbol(self.curr_token.value)
         elif self.accept('STRING'):
-            return String(self.curr_token.value)
+            return self.curr_token.value
         elif self.accept('INT'):
-            return Integer(self.curr_token.value)
+            return self.curr_token.value
         elif self.accept('FLOAT'):
-            return Float(self.curr_token.value)
+            return self.curr_token.value
         else:
             return self.parse_list()
 
@@ -47,7 +44,7 @@ class Parser:
             except ParseError:
                 break
         self.expect('RPAREN')
-        return List(expressions)
+        return expressions
 
     def accept(self, type):
         if self.next_token and self.next_token.type == type:
