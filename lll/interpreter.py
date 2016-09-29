@@ -35,6 +35,7 @@ class Interpreter:
         'lambda': Operator('op_lambda'),
         'if': Operator('op_if'),
         'load': Operator('op_load'),
+        'to-string': Builtin('builtin_to_string', 1, False),
         'print': Builtin('builtin_print', 0, True),
         '=': Builtin('builtin_eq', 2, True),
         '<': Builtin('builtin_lt', 2, False),
@@ -150,20 +151,22 @@ class Interpreter:
             raise RuntimeError("load requires a string argument")
         return self.execute_file(filename, env)
 
+    def builtin_to_string(self, value):
+        if isinstance(value, (str, int, long, float)):
+            return str(value)
+        elif isinstance(value, Operator):
+            return '<operator>'
+        elif isinstance(value, Builtin):
+            return '<builtin>'
+        elif isinstance(value, Lambda):
+            return '<lambda>'
+        else:
+            raise RuntimeError("[BUG] Don't know how to print: %s" % repr(arg))
+
     def builtin_print(self, *args):
-        string = ''
-        for arg in args:
-            if isinstance(arg, (str, int, long, float)):
-                string += str(arg)
-            elif isinstance(arg, Operator):
-                string += '<operator>'
-            elif isinstance(arg, Builtin):
-                string += '<builtin>'
-            elif isinstance(arg, Lambda):
-                string += '<lambda>'
-            else:
-                raise RuntimeError("[BUG] Don't know how to print: %s" % repr(arg))
-        print(string)
+        print(''.join(self.builtin_to_string(arg) for arg in args))
+        return None
+
 
     def builtin_eq(self, *args):
         return int(args.count(args[0]) == len(args))
