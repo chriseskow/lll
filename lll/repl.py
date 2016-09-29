@@ -35,7 +35,7 @@ class REPL:
                 except IncompleteParseError as e:
                     continue
                 if value:
-                    print(self.OUTPUT_PROMPT + repr(value))
+                    print(self.OUTPUT_PROMPT + self.interpreter.builtin_repr(value))
             except:
                 print_exc()
             input = ''

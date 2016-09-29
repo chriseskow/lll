@@ -36,6 +36,7 @@ class Interpreter:
         'if': Operator('op_if'),
         'load': Operator('op_load'),
         'to-string': Builtin('builtin_to_string', 1, False),
+        'repr': Builtin('builtin_repr', 1, False),
         'print': Builtin('builtin_print', 0, True),
         '=': Builtin('builtin_eq', 2, True),
         '<': Builtin('builtin_lt', 2, False),
@@ -163,10 +164,15 @@ class Interpreter:
         else:
             raise RuntimeError("[BUG] Don't know how to print: %s" % repr(arg))
 
+    def builtin_repr(self, value):
+        if isinstance(value, str):
+            return '"' + value + '"' # TODO: escape slashes
+        else:
+            return self.builtin_to_string(value)
+
     def builtin_print(self, *args):
         print(''.join(self.builtin_to_string(arg) for arg in args))
         return None
-
 
     def builtin_eq(self, *args):
         return int(args.count(args[0]) == len(args))
