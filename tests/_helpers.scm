@@ -1,28 +1,28 @@
-(def assert-helper (lambda (comparator expected actual)
+(def (assert-helper comparator expected actual)
   (if (comparator)
     (print "OK (" actual ")")
-    (print "FAIL (expected: " expected ", actual: "  actual ")"))))
+    (print "FAIL (expected: " expected ", actual: "  actual ")")))
 
-(def assert (lambda (expected actual)
+(def (assert expected actual)
   (assert-helper
     (lambda () (= expected actual))
     expected
-    actual)))
+    actual))
 
-(def assert-tolerance (lambda (expected actual tolerance)
-  (def <= (lambda (x y)
+(def (assert-tolerance expected actual tolerance)
+  (def (<= x y)
     (if (< x y)
       1
       (if (= x y)
         1
-        0))))
-  (def abs (lambda (x)
+        0)))
+  (def (abs x)
     (if (< x 0)
       (- 0 x)
-      x)))
-  (def almost-equal? (lambda (x y tolerance)
-    (<= (abs (- x y)) tolerance)))
+      x))
+  (def (almost-equal? x y tolerance)
+    (<= (abs (- x y)) tolerance))
   (assert-helper
     (lambda () (almost-equal? expected actual tolerance))
     expected
-    actual)))
+    actual))

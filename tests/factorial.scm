@@ -1,11 +1,11 @@
 (load "./_helpers.scm")
 
-(def zero? (lambda (n) (= n 0)))
-(def decr (lambda (n) (- n 1)))
-(def fact (lambda (n)
+(def (zero? n) (= n 0))
+(def (decr n) (- n 1))
+(def (fact n)
   (if (zero? n)
     1
-    (* n (fact (decr n))))))
+    (* n (fact (decr n)))))
 
 (assert 1 (fact 0))
 (assert 1 (fact 1))

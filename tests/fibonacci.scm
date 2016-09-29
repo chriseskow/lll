@@ -1,11 +1,11 @@
 (load "./_helpers.scm")
 
-(def fib (lambda (n)
+(def (fib n)
   (if (< n 2)
     n
     (+
       (fib (- n 1))
-      (fib (- n 2))))))
+      (fib (- n 2)))))
 
 (assert 0 (fib 0))
 (assert 1 (fib 1))
