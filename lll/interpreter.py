@@ -118,33 +118,30 @@ class Interpreter:
         return args[0]
 
     def op_def(self, args, env):
-        if len(args) != 2:
-            raise RuntimeError("def called with wrong number of arguments")
-        (symbol, value_expr) = args
-        if not isinstance(symbol, Symbol):
-            raise RuntimeError("def called without an identifier as first argument")
-        value = self.eval(value_expr, env)
+        if len(args) != 2 or not isinstance(args[0], Symbol):
+            raise RuntimeError("Invalid syntax for def")
+        (symbol, expr) = args
+        value = self.eval(expr, env)
         env.define(symbol, value)
         return value
 
     def op_lambda(self, args, env):
-        if len(args) < 2:
-            raise RuntimeError("lambda called with wrong number of arguments")
-        params = self.require_param_list(args[0])
-        return Lambda(params, args[1:], env)
+        if len(args) < 2 or not self.is_symbol_list(args[0]):
+            raise RuntimeError("Invalid syntax for lambda")
+        return Lambda(args[0], args[1:], env)
 
     def op_if(self, args, env):
         if len(args) != 3:
-            raise RuntimeError("if requires 3 arguments")
+            raise RuntimeError("Invalid syntax for if")
         (cond, then_expr, else_expr) = args
         return self.eval(then_expr if self.eval(cond, env) else else_expr, env)
 
     def op_load(self, args, env):
         if len(args) != 1:
-            raise RuntimeError("load requires 1 argument")
+            raise RuntimeError("Invalid syntax for load")
         filename = self.eval(args[0], env)
         if not isinstance(filename, str):
-            raise RuntimeError("load requires a string argument")
+            raise RuntimeError("Invalid syntax for load")
         resolved_filename = self.resolve_filename(filename, env)
         code = open(resolved_filename).read()
         old_source = env.source
@@ -165,12 +162,5 @@ class Interpreter:
                 return full_path
         raise RuntimeError("Cannot find file: %s in %s" % (filename, builtins.builtin_repr(load_paths)))
 
-    def require_param_list(self, items):
-        if not isinstance(items, list):
-            raise RuntimeError("lambda called without argument list")
-        params = []
-        for item in items:
-            if not isinstance(item, Symbol):
-                raise RuntimeError("lambda called with non-identifier param")
-            params.append(item)
-        return params
+    def is_symbol_list(self, items):
+        return isinstance(items, list) and all(isinstance(item, Symbol) for item in items)
