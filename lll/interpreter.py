@@ -118,11 +118,16 @@ class Interpreter:
         return args[0]
 
     def op_def(self, args, env):
-        if len(args) != 2 or not isinstance(args[0], Symbol):
+        if len(args) == 2 and isinstance(args[0], Symbol):
+            (name, expr) = args
+            value = self.eval(expr, env)
+        elif len(args) >= 2 and self.is_symbol_list(args[0]):
+            (name, params) = (args[0][0], args[0][1:])
+            body = args[1:]
+            value = Lambda(params, body, env)
+        else:
             raise RuntimeError("Invalid syntax for def")
-        (symbol, expr) = args
-        value = self.eval(expr, env)
-        env.define(symbol, value)
+        env.define(name, value)
         return value
 
     def op_lambda(self, args, env):
