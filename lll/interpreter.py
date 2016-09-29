@@ -47,21 +47,21 @@ class Interpreter:
     def execute_string(self, code, env=None):
         tokenizer = Tokenizer(code)
         parser = Parser(tokenizer)
-        program = parser.parse()
-        return self.execute(program, env)
+        sequence = parser.parse()
+        return self.execute(sequence, env)
 
     def execute_file(self, filename, env=None):
         code = open(filename).read()
         tokenizer = Tokenizer(code)
         parser = Parser(tokenizer)
-        program = parser.parse()
-        return self.execute(program, env)
+        sequence = parser.parse()
+        return self.execute(sequence, env)
 
-    def execute(self, program, env=None):
+    def execute(self, sequence, env=None):
         if env is None:
             env = self.make_global_env()
         retval = None
-        for expr in program.expressions:
+        for expr in sequence.expressions:
             retval = self.eval(expr, env)
         return retval
 

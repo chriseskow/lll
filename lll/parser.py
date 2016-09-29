@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-Program = namedtuple('Program', ('expressions'))
+Sequence = namedtuple('Sequence', ('expressions'))
 List = namedtuple('List', ('items'))
 Identifier = namedtuple('Identifier', ('name'))
 String = namedtuple('String', ('value'))
@@ -15,14 +15,14 @@ class Parser:
         self.curr_token = None
         self.next_token = None
         self.consume()
-        return self.parse_program()
+        return self.parse_sequence()
 
-    # program = expression*
-    def parse_program(self):
+    # sequence = expression*
+    def parse_sequence(self):
         expressions = []
         while self.next_token:
             expressions.append(self.parse_expression())
-        return Program(expressions)
+        return Sequence(expressions)
 
     # expression = IDENT | STRING | INT | FLOAT | list
     def parse_expression(self):
