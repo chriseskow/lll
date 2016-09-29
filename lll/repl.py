@@ -1,6 +1,7 @@
 from traceback import print_exc
 import readline
 from lll.parser import IncompleteParseError
+from lll.builtins import builtin_repr
 
 if 'libedit' in readline.__doc__:
     readline.parse_and_bind("bind -e")
@@ -35,7 +36,7 @@ class REPL:
                 except IncompleteParseError as e:
                     continue
                 if value:
-                    print(self.OUTPUT_PROMPT + self.interpreter.builtin_repr(value))
+                    print(self.OUTPUT_PROMPT + builtin_repr(value))
             except:
                 print_exc()
             input = ''

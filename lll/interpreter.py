@@ -3,8 +3,11 @@ from lll.tokenizer import Tokenizer
 from lll.parser import *
 
 Operator = namedtuple('Operator', ('attr_name'))
-Builtin = namedtuple('Builtin', ('attr_name', 'required_args', 'variable_args'))
+Builtin = namedtuple('Builtin', ('func', 'required_args', 'variable_args'))
 Lambda = namedtuple('Lambda', ('params', 'body', 'env'))
+
+# TODO: this needs to be below above classes due to circular dependency
+import lll.builtins as builtins
 
 class Env:
     def __init__(self, symbols={}, outer=None):
@@ -36,15 +39,15 @@ class Interpreter:
         'lambda': Operator('op_lambda'),
         'if': Operator('op_if'),
         'load': Operator('op_load'),
-        'to-string': Builtin('builtin_to_string', 1, False),
-        'repr': Builtin('builtin_repr', 1, False),
-        'print': Builtin('builtin_print', 0, True),
-        '=': Builtin('builtin_eq', 2, True),
-        '<': Builtin('builtin_lt', 2, False),
-        '>': Builtin('builtin_gt', 2, False),
-        '+': Builtin('builtin_add', 1, True),
-        '-': Builtin('builtin_sub', 1, True),
-        '*': Builtin('builtin_mul', 1, True)
+        'to-string': Builtin(builtins.builtin_to_string, 1, False),
+        'repr': Builtin(builtins.builtin_repr, 1, False),
+        'print': Builtin(builtins.builtin_print, 0, True),
+        '=': Builtin(builtins.builtin_eq, 2, True),
+        '<': Builtin(builtins.builtin_lt, 2, False),
+        '>': Builtin(builtins.builtin_gt, 2, False),
+        '+': Builtin(builtins.builtin_add, 1, True),
+        '-': Builtin(builtins.builtin_sub, 1, True),
+        '*': Builtin(builtins.builtin_mul, 1, True)
     }
 
     def execute_string(self, code, env=None):
@@ -100,8 +103,7 @@ class Interpreter:
     def apply(self, func, args):
         if isinstance(func, Builtin):
             self.check_args(args, func.required_args, func.variable_args)
-            callable = getattr(self, func.attr_name)
-            return callable(*args)
+            return func.func(*args)
         elif isinstance(func, Lambda):
             self.check_args(args, len(func.params), False)
             symbols = dict(zip(func.params, args))
@@ -157,75 +159,6 @@ class Interpreter:
         if not isinstance(filename, str):
             raise RuntimeError("load requires a string argument")
         return self.execute_file(filename, env)
-
-    def builtin_to_string(self, value):
-        if isinstance(value, (str, int, long, float)):
-            return str(value)
-        elif isinstance(value, Operator):
-            return '<operator>'
-        elif isinstance(value, Builtin):
-            return '<builtin>'
-        elif isinstance(value, Lambda):
-            return '<lambda>'
-
-        # TODO: shouldn't these be the same as above???
-        # Perhaps eval() should return String, Integer, etc. instead of
-        # the underlying Python primitives.
-        elif isinstance(value, (String, Integer, Float)):
-            return str(value.value)
-        elif isinstance(value, Identifier):
-            return value.name
-        elif isinstance(value, List):
-            return '(' + ' '.join(self.builtin_to_string(item) for item in value.items) + ')'
-
-        else:
-            raise RuntimeError("[BUG] Don't know how to print: %s" % repr(value))
-
-    def builtin_repr(self, value):
-        if isinstance(value, str):
-            return '"' + value + '"' # TODO: escape slashes
-        elif isinstance(value, (int, long, float)):
-            return str(value)
-        elif isinstance(value, Operator):
-            return '<operator>'
-        elif isinstance(value, Builtin):
-            return '<builtin>'
-        elif isinstance(value, Lambda):
-            return '<lambda>'
-
-        # TODO: shouldn't these be the same as above???
-        # Perhaps eval() should return String, Integer, etc. instead of
-        # the underlying Python primitives.
-        elif isinstance(value, String):
-            return '"' + value.value + '"' # TODO: escape slashes
-        elif isinstance(value, (Integer, Float)):
-            return str(value.value)
-        elif isinstance(value, Identifier):
-            return value.name
-        elif isinstance(value, List):
-            return '(' + ' '.join(self.builtin_repr(item) for item in value.items) + ')'
-
-        else:
-            raise RuntimeError("[BUG] Don't know how to print: %s" % repr(value))
-
-    def builtin_print(self, *args):
-        print(''.join(self.builtin_to_string(arg) for arg in args))
-        return None
-
-    def builtin_eq(self, *args):
-        return int(args.count(args[0]) == len(args))
-
-    def builtin_lt(self, x, y):
-        return int(x < y)
-
-    def builtin_add(self, *args):
-        return sum(args)
-
-    def builtin_sub(self, *args):
-        return reduce(lambda sum, n: sum - n, args[1:], args[0])
-
-    def builtin_mul(self, *args):
-        return reduce(lambda product, n: product * n, args, 1)
 
     def require_param_list(self, list):
         if not isinstance(list, List):
