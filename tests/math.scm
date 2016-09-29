@@ -1,4 +1,4 @@
-(load "_helpers.scm")
+(load "./_helpers.scm")
 
 ; Addition
 (assert 1 (+ 1))

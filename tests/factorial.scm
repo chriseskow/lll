@@ -1,4 +1,4 @@
-(load "_helpers.scm")
+(load "./_helpers.scm")
 
 (def zero? (lambda (n) (= n 0)))
 (def decr (lambda (n) (- n 1)))

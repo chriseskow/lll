@@ -1,4 +1,4 @@
-(load "_helpers.scm")
+(load "./_helpers.scm")
 
 (def fib (lambda (n)
   (if (< n 2)

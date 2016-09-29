@@ -1,5 +1,6 @@
+import os
 from collections import namedtuple
-from lll.tokenizer import Tokenizer
+from lll.tokenizer import Source, Tokenizer
 from lll.parser import Parser, Symbol
 
 Operator = namedtuple('Operator', ('attr_name'))
@@ -10,7 +11,8 @@ Lambda = namedtuple('Lambda', ('params', 'body', 'env'))
 import lll.builtins as builtins
 
 class Env:
-    def __init__(self, symbols={}, outer=None):
+    def __init__(self, source, symbols={}, outer=None):
+        self.source = source
         self.symbols = symbols
         self.outer = outer
 
@@ -39,6 +41,7 @@ class Interpreter:
         'lambda': Operator('op_lambda'),
         'if': Operator('op_if'),
         'load': Operator('op_load'),
+        'load-paths': ['.'],
         'to-string': Builtin(builtins.builtin_to_string, 1, False),
         'repr': Builtin(builtins.builtin_repr, 1, False),
         'print': Builtin(builtins.builtin_print, 0, True),
@@ -50,26 +53,20 @@ class Interpreter:
         '*': Builtin(builtins.builtin_mul, 1, True)
     }
 
-    def execute_string(self, code, env=None):
-        tokenizer = Tokenizer(code)
+    def execute(self, source, env=None):
+        tokenizer = Tokenizer(source)
         parser = Parser(tokenizer)
         sequence = parser.parse()
-        return self.execute(sequence, env)
-
-    def execute_file(self, filename, env=None):
-        code = open(filename).read()
-        return self.execute_string(code, env)
-
-    def execute(self, sequence, env=None):
         if env is None:
-            env = self.make_global_env()
+            env = self.make_global_env(source)
+
         retval = None
         for expr in sequence:
             retval = self.eval(expr, env)
         return retval
 
-    def make_global_env(self):
-        return Env(self.PRIMITIVES.copy())
+    def make_global_env(self, source):
+        return Env(source, self.PRIMITIVES.copy())
 
     def eval(self, expr, env):
         if isinstance(expr, Symbol):
@@ -104,7 +101,7 @@ class Interpreter:
         elif isinstance(func, Lambda):
             self.check_args(args, len(func.params), False)
             symbols = dict(zip(func.params, args))
-            env = Env(symbols, func.env)
+            env = Env(func.env.source, symbols, func.env)
             retval = None
             for expr in func.body:
                 retval = self.eval(expr, env)
@@ -154,7 +151,25 @@ class Interpreter:
         filename = self.eval(args[0], env)
         if not isinstance(filename, str):
             raise RuntimeError("load requires a string argument")
-        return self.execute_file(filename, env)
+        resolved_filename = self.resolve_filename(filename, env)
+        code = open(resolved_filename).read()
+        old_source = env.source
+        env.source = Source(filename, code)
+        self.execute(env.source, env)
+        env.source = old_source
+        return None
+
+    def resolve_filename(self, filename, env):
+        load_paths = list(env.lookup('load-paths'))
+        if '/' in filename:
+            dir = os.path.dirname(env.source.filename)
+            if dir:
+                load_paths.insert(0, dir)
+        for path in load_paths:
+            full_path = os.path.join(path, filename)
+            if os.path.isfile(full_path):
+                return full_path
+        raise RuntimeError("Cannot find file: %s in %s" % (filename, builtins.builtin_repr(load_paths)))
 
     def require_param_list(self, items):
         if not isinstance(items, list):

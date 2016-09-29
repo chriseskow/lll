@@ -1,4 +1,4 @@
-(load "_helpers.scm")
+(load "./_helpers.scm")
 
 ; Equality
 (assert 1 (= "" ""))

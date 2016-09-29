@@ -5,6 +5,7 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(sys.argv[0]) + '/..'))
 
+from lll.tokenizer import Source
 from lll.interpreter import Interpreter
 
 def main():
@@ -18,7 +19,10 @@ def main():
         repl = REPL(interpreter)
         repl.run()
     else:
-        interpreter.execute_file(sys.argv[1])
+        filename = sys.argv[1]
+        code = open(filename).read()
+        source = Source(filename, code)
+        interpreter.execute(source)
 
 if __name__ == '__main__':
     main()

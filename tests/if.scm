@@ -1,4 +1,4 @@
-(load "_helpers.scm")
+(load "./_helpers.scm")
 
 (assert 20 (if 0 10 20))
 (assert 20 (if 0.0 10 20))

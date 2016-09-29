@@ -1,5 +1,6 @@
 from traceback import print_exc
 import readline
+from lll.tokenizer import Source
 from lll.parser import IncompleteParseError
 from lll.builtins import builtin_repr
 
@@ -20,7 +21,8 @@ class REPL:
         readline.set_completer(self.complete)
 
     def run(self):
-        self.env = self.interpreter.make_global_env()
+        source = Source('<repl>', '')
+        self.env = self.interpreter.make_global_env(source)
 
         input = ''
         while True:
@@ -32,7 +34,8 @@ class REPL:
                     print('')
                     return
                 try:
-                    value = self.interpreter.execute_string(input, self.env)
+                    source = Source('<repl>', input)
+                    value = self.interpreter.execute(source, self.env)
                 except IncompleteParseError as e:
                     continue
                 if value:
